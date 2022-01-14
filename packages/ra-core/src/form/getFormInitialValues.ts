@@ -2,20 +2,12 @@ import merge from 'lodash/merge';
 import { Record } from '../types';
 
 export default function getFormInitialValues(
-    initialValues: any,
-    defaultValue: DefaultValue,
+    defaultValues: DefaultValue,
     record: Partial<Record>
 ) {
-    if (typeof defaultValue !== 'undefined') {
-        console.warn(
-            '"defaultValue" is deprecated, please use "initialValues" instead'
-        );
-    }
-
     const finalInitialValues = merge(
         {},
-        getValues(defaultValue, record),
-        getValues(initialValues, record),
+        getValues(defaultValues, record),
         record
     );
     return finalInitialValues;
