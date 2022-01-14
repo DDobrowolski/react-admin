@@ -29,9 +29,7 @@ export const TabbedFormView = (props: TabbedFormViewProps): ReactElement => {
         className,
         formRootPathname,
         handleSubmit,
-        invalid,
         mutationMode,
-        pristine,
         record,
         saving,
         submitOnEnter = true,
@@ -40,7 +38,6 @@ export const TabbedFormView = (props: TabbedFormViewProps): ReactElement => {
         toolbar = DefaultToolbar,
         variant,
         margin,
-        validating,
         ...rest
     } = props;
     const location = useLocation();
@@ -104,19 +101,7 @@ export const TabbedFormView = (props: TabbedFormViewProps): ReactElement => {
                         : null;
                 })}
             </div>
-            {toolbar &&
-                React.cloneElement(toolbar, {
-                    basePath,
-                    className: 'toolbar',
-                    invalid,
-                    mutationMode,
-                    pristine,
-                    record,
-                    resource,
-                    saving,
-                    submitOnEnter,
-                    validating,
-                })}
+            {toolbar}
         </Root>
     );
 };
@@ -165,33 +150,7 @@ export interface TabbedFormViewProps extends FormWithRedirectRenderProps {
     __versions?: any; // react-final-form internal prop, missing in their type
 }
 
-const sanitizeRestProps = ({
-    active,
-    dirty,
-    dirtyFields,
-    dirtyFieldsSinceLastSubmit,
-    dirtySinceLastSubmit,
-    error,
-    errors,
-    form,
-    hasSubmitErrors,
-    hasValidationErrors,
-    initialValues,
-    modified = null,
-    modifiedSinceLastSubmit,
-    save = null,
-    submitError,
-    submitErrors,
-    submitFailed,
-    submitSucceeded,
-    submitting,
-    touched = null,
-    valid,
-    values,
-    visited = null,
-    __versions = null,
-    ...props
-}) => props;
+const sanitizeRestProps = ({ save = null, ...props }) => props;
 
 const PREFIX = 'RaTabbedForm';
 
