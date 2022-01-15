@@ -1,7 +1,7 @@
 import * as React from 'react';
 import expect from 'expect';
-import { SaveContextProvider } from 'ra-core';
-import { renderWithRedux } from 'ra-test';
+import { CoreAdminContext, testDataProvider } from 'ra-core';
+import { render, screen } from '@testing-library/react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TabbedForm } from './TabbedForm';
 import { FormTab } from './FormTab';
@@ -9,40 +9,35 @@ import { TextInput } from '../input';
 import { defaultTheme } from '../defaultTheme';
 
 describe('<FormTab label="foo" />', () => {
-    const saveContextValue = {
-        save: jest.fn(),
-        saving: false,
-    };
-
     it('should display <Toolbar />', () => {
-        const { queryByLabelText } = renderWithRedux(
-            <ThemeProvider theme={createTheme(defaultTheme)}>
-                <SaveContextProvider value={saveContextValue}>
+        render(
+            <CoreAdminContext dataProvider={testDataProvider()}>
+                <ThemeProvider theme={createTheme(defaultTheme)}>
                     <TabbedForm>
                         <FormTab label="foo">
                             <TextInput source="name" />
                             <TextInput source="city" />
                         </FormTab>
                     </TabbedForm>
-                </SaveContextProvider>
-            </ThemeProvider>
+                </ThemeProvider>
+            </CoreAdminContext>
         );
-        expect(queryByLabelText('ra.action.save')).not.toBeNull();
+        expect(screen.queryByLabelText('ra.action.save')).not.toBeNull();
     });
 
     it('should not alter default margin or variant', () => {
-        const { queryByLabelText } = renderWithRedux(
-            <ThemeProvider theme={createTheme(defaultTheme)}>
-                <SaveContextProvider value={saveContextValue}>
+        render(
+            <CoreAdminContext dataProvider={testDataProvider()}>
+                <ThemeProvider theme={createTheme(defaultTheme)}>
                     <TabbedForm>
                         <FormTab label="foo">
                             <TextInput source="name" />
                         </FormTab>
                     </TabbedForm>
-                </SaveContextProvider>
-            </ThemeProvider>
+                </ThemeProvider>
+            </CoreAdminContext>
         );
-        const inputElement = queryByLabelText(
+        const inputElement = screen.queryByLabelText(
             'resources.undefined.fields.name'
         );
         expect(inputElement.classList).toContain('MuiFilledInput-input');
@@ -52,12 +47,20 @@ describe('<FormTab label="foo" />', () => {
     });
 
     it('should render a TabbedForm with FormTabs having custom props without warnings', () => {
-        const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        let countWarnings = 0;
+        const spy = jest
+            .spyOn(console, 'error')
+            .mockImplementation((message: string) => {
+                if (!message.includes('a test was not wrapped in act')) {
+                    countWarnings++;
+                }
+            });
 
         const record = { id: 'gazebo', name: 'foo' };
-        const { container } = renderWithRedux(
-            <ThemeProvider theme={createTheme(defaultTheme)}>
-                <SaveContextProvider value={saveContextValue}>
+
+        const { container } = render(
+            <CoreAdminContext dataProvider={testDataProvider()}>
+                <ThemeProvider theme={createTheme(defaultTheme)}>
                     <TabbedForm>
                         <FormTab
                             label="First"
@@ -90,28 +93,28 @@ describe('<FormTab label="foo" />', () => {
                             <TextInput source="name" />
                         </FormTab>
                     </TabbedForm>
-                </SaveContextProvider>
-            </ThemeProvider>
+                </ThemeProvider>
+            </CoreAdminContext>
         );
-        expect(spy).not.toHaveBeenCalled();
+        expect(countWarnings).toEqual(0);
         expect(container).not.toBeNull();
 
         spy.mockRestore();
     });
 
     it('should pass variant and margin to child inputs', () => {
-        const { queryByLabelText } = renderWithRedux(
-            <ThemeProvider theme={createTheme(defaultTheme)}>
-                <SaveContextProvider value={saveContextValue}>
+        render(
+            <CoreAdminContext dataProvider={testDataProvider()}>
+                <ThemeProvider theme={createTheme(defaultTheme)}>
                     <TabbedForm>
                         <FormTab label="foo" variant="outlined" margin="normal">
                             <TextInput source="name" />
                         </FormTab>
                     </TabbedForm>
-                </SaveContextProvider>
-            </ThemeProvider>
+                </ThemeProvider>
+            </CoreAdminContext>
         );
-        const inputElement = queryByLabelText(
+        const inputElement = screen.queryByLabelText(
             'resources.undefined.fields.name'
         );
         expect(inputElement.classList).toContain('MuiOutlinedInput-input');
@@ -121,9 +124,9 @@ describe('<FormTab label="foo" />', () => {
     });
 
     it('should allow input children to override variant and margin', () => {
-        const { queryByLabelText } = renderWithRedux(
-            <ThemeProvider theme={createTheme(defaultTheme)}>
-                <SaveContextProvider value={saveContextValue}>
+        render(
+            <CoreAdminContext dataProvider={testDataProvider()}>
+                <ThemeProvider theme={createTheme(defaultTheme)}>
                     <TabbedForm>
                         <FormTab label="foo" variant="standard" margin="none">
                             <TextInput
@@ -133,10 +136,10 @@ describe('<FormTab label="foo" />', () => {
                             />
                         </FormTab>
                     </TabbedForm>
-                </SaveContextProvider>
-            </ThemeProvider>
+                </ThemeProvider>
+            </CoreAdminContext>
         );
-        const inputElement = queryByLabelText(
+        const inputElement = screen.queryByLabelText(
             'resources.undefined.fields.name'
         );
         expect(inputElement.classList).toContain('MuiOutlinedInput-input');
