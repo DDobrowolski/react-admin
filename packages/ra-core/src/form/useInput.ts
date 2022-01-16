@@ -52,11 +52,13 @@ export type UseInputValue = {
 export const useInput = (props: InputProps): UseInputValue => {
     const {
         defaultValue,
+        format,
         id,
         isRequired: isRequiredOption,
         name,
         onBlur,
         onChange,
+        parse,
         source,
         validate,
         ...options
@@ -140,6 +142,7 @@ export const useInput = (props: InputProps): UseInputValue => {
 
     const field = {
         ...controllerField,
+        value: format ? format(controllerField.value) : controllerField.value,
         onBlur: (...event: any[]) => {
             if (onBlur) {
                 onBlur(...event);
@@ -150,7 +153,10 @@ export const useInput = (props: InputProps): UseInputValue => {
             if (onChange) {
                 onChange(...event);
             }
-            controllerField.onChange(...event);
+            const eventOrValue = (event[0]?.target?.value || event[0]) as any;
+            controllerField.onChange(
+                parse ? parse(eventOrValue) : eventOrValue
+            );
         },
     };
 
